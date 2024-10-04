@@ -52,30 +52,35 @@ string continueOrBack(vector<string> back) {
 //======================================================================================================================
 
 void correctSentence() {
-    string corrected, sentence;
+    string corrected, sentence, holeSentence = "";
     bool found = false;
 
     cout << "\nThis part of my program gets a sentence and correct is.\n";
     cout << "\nEnter the sentence you want to correct :";
     cout << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    getline(cin, sentence);
+    while (true) {
+        getline(cin, sentence);
+        holeSentence += sentence;
+        if (sentence[sentence.size() - 1] == '.') break;
+        else holeSentence += ' ';
+    }
 
-    for (int i = 0; i < sentence.size(); ++i) {
-        if ((isspace(sentence[i]) && !found && i != 0) ||
-            (isspace(sentence[i]) && !found && i != 0 && sentence[i - 1] == '.') ||
-            (isspace(sentence[i]) && !found && i != 0 && sentence[i - 1] == ',')) {
+    for (int i = 0; i < holeSentence.size(); ++i) {
+        if ((isspace(holeSentence[i]) && !found && i != 0) ||
+            (isspace(holeSentence[i]) && !found && i != 0 && holeSentence[i - 1] == '.') ||
+            (isspace(holeSentence[i]) && !found && i != 0 && holeSentence[i - 1] == ',')) {
             corrected += " ";
             found = true;
-        } else if ((isspace(sentence[i]) && found) || (isspace(sentence[i]) && !found && i == 0)) continue;
+        } else if ((isspace(holeSentence[i]) && found) || (isspace(holeSentence[i]) && !found && i == 0)) continue;
         else {
             found = false;
-            corrected += sentence[i];
+            corrected += holeSentence[i];
         }
     }
 
     for (int i = 0; i < corrected.size(); ++i) {
-        if ((i == 0 && !isspace(corrected[i])) || (i > 2 && isspace(corrected[i - 1]) && corrected[i - 2] == '.')) {
+        if ((i == 0 && !isspace(corrected[i]))) {
             if (isalpha(corrected[i])) corrected[i] = toupper(corrected[i]);
         } else {
             if (isalpha(corrected[i])) corrected[i] = tolower(corrected[i]);
@@ -83,11 +88,8 @@ void correctSentence() {
         if ((isspace(corrected[i]) && corrected[i + 1] == '.') ||
             (isspace(corrected[i]) && corrected[i + 1] == ','))
             corrected.erase(i, 1);
-        if ((!isspace(corrected[i + 1]) && corrected[i] == ',') ||
-            (!isspace(corrected[i + 1]) && corrected[i] == '.'))
-            corrected.insert(i + 1, 1, ' ');
+        if ((!isspace(corrected[i + 1]) && corrected[i] == ',')) corrected.insert(i + 1, 1, ' ');
     }
-    if (corrected[corrected.size() - 1] != '.') corrected += '.';
     cout << "The corrected sentence is : " << corrected << endl;
 }
 
@@ -274,31 +276,17 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
 }
 
 void gameOfDominos() {
-    vector<dominoT> dominos;
     string number, element;
     map<long long, long long> freq;
     long long num, odd = 0;
-    bool notInteger = false;
+    bool notInteger = true;
+    int ele;
     cout << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Please enter number of dominos :";
     getline(cin, number);
-    for (int i = 0; i < number.size(); ++i) {
-        if (number[i] != '0' && number[i] != '1' && number[i] != '2' && number[i] != '3' && number[i] != '4' &&
-            number[i] != '5' && number[i] != '6' && number[i] != '7' && number[i] != '8' && number[i] != '9') {
-            notInteger = true;
-            break;
-        }
-    }
-    if (!notInteger) {
-        num = stoll(number);
-        if (num < 1) notInteger = true;
-    }
     while (notInteger) {
         notInteger = false;
-        cout << endl;
-        cout << "Please enter a correct number of dominos :";
-        getline(cin, number);
         for (int i = 0; i < number.size(); ++i) {
             if (number[i] != '0' && number[i] != '1' && number[i] != '2' && number[i] != '3' && number[i] != '4' &&
                 number[i] != '5' && number[i] != '6' && number[i] != '7' && number[i] != '8' && number[i] != '9') {
@@ -310,49 +298,65 @@ void gameOfDominos() {
             num = stoll(number);
             if (num < 1) notInteger = true;
         }
+        if (notInteger) {
+            cout << "\nPlease enter a correct number of dominos :";
+            getline(cin, number);
+        }
     }
     num = stoll(number);
+    vector<dominoT> dominos(num);
 
-    for (int i = 0; i < num; ++i) {
+    for (long long i = 0; i < num; ++i) {
         notInteger = true;
-        cout << "\nPlease enter the Left Dots in " << i+1 << " dominos :";
+        cout << "\nPlease enter the Left Dots in " << i + 1 << " dominos :";
         getline(cin, element);
         while (notInteger) {
             notInteger = false;
-            if (element != "0" && element != "1" && element != "2" && element != "3" && element != "4" &&
-                element != "5" && element != "6") {
-                notInteger = true;
+            for (int j = 0; j < element.size(); ++j) {
+                if (element[j] != '0' && element[j] != '1' && element[j] != '2' && element[j] != '3' &&
+                    element[j] != '4' && element[j] != '5' && element[j] != '6') {
+                    notInteger = true;
+                    break;
+                }
             }
-            if (stoi(element) > 6) {
-                notInteger = true;
+            if (!notInteger) {
+                ele = stoi(element);
+                if (ele > 6) notInteger = true;
             }
             if (notInteger) {
-                cout << "Please enter a valid Left Dots in " << i+1 << " dominos :";
+                cout << "\nPlease enter a valid Left Dots number in " << i + 1 << " dominos :";
                 getline(cin, element);
             }
         }
-        dominos[i].leftDots = stoi(element);
-        freq[dominos[i].leftDots]++;
+        ele = stoi(element);
+        dominos[i].leftDots = ele;
+        freq[ele]++;
 
         notInteger = true;
-        cout << "Please enter the Right Dots in " << i+1 << " dominos :";
+        cout << "\nPlease enter the Right Dots in " << i + 1 << " dominos :";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, element);
         while (notInteger) {
             notInteger = false;
-            if (element != "0" && element != "1" && element != "2" && element != "3" && element != "4" &&
-                element != "5" && element != "6") {
-                notInteger = true;
+            for (int j = 0; j < element.size(); ++j) {
+                if (element[j] != '0' && element[j] != '1' && element[j] != '2' && element[j] != '3' &&
+                    element[j] != '4' && element[j] != '5' && element[j] != '6') {
+                    notInteger = true;
+                    break;
+                }
             }
-            if (stoi(element) > 6) {
-                notInteger = true;
+            if (!notInteger) {
+                ele = stoi(element);
+                if (ele > 6) notInteger = true;
             }
             if (notInteger) {
-                cout << "Please enter a valid Left Dots in " << i+1 << " dominos :";
+                cout << "\nPlease enter a valid Right Dots number in " << i + 1 << " dominos :";
                 getline(cin, element);
             }
         }
-        dominos[i].rightDots = stoi(element);
-        freq[dominos[i].rightDots]++;
+        ele = stoi(element);
+        dominos[i].rightDots = ele;
+        freq[ele]++;
     }
 
     for (auto it: freq) {
