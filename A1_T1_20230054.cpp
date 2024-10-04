@@ -197,82 +197,31 @@ struct dominoT {
 
 bool FormsDominoChain(vector<dominoT> &dominos) {
     static int start = 0;
-//    vector<int> first,second;
+    vector<int> fi, la;
+    int first, second;
     deque<int> arrange;
-    if (start == 0) arrange.push_back(0);
-    if (start == dominos.size() - 1) {
 
+    for (int i = 0; i < dominos.size() && start == 1; ++i) {
+        fi.push_back(dominos[i].leftDots);
+        la.push_back(dominos[i].rightDots);
     }
 
-
+    if (start == 0) arrange.push_back(0);
+    else if (start == dominos.size() - 1) {
+        first = dominos[start - 1].rightDots;
+        auto it = find(fi.begin(), fi.end(), first);
+        if (it != fi.end()) arrange.push_back(it - fi.begin());
+        for (int i = 0; i < dominos.size(); ++i) {
+            dominos[i].leftDots = fi[arrange[i]];
+            dominos[i].rightDots = la[arrange[i]];
+        }
+    } else {
+        first = dominos[start - 1].rightDots;
+        auto it = find(fi.begin(), fi.end(), first);
+        if (it != fi.end()) arrange.push_back(it - fi.begin());
+    }
     start++;
     return FormsDominoChain(dominos);
-
-
-//    for (int i = 0; i < dominos.size(); ++i) {
-//        first.push_back(dominos[i].leftDots) ;
-//        second.push_back(dominos[i].rightDots);
-//    }
-
-//    for (int i = 0; i < elements.size(); ++i) {
-//        found = false;
-//        for (int j = 0; j < elements.size(); ++j) {
-//            if (i != j) {
-//                if (elements[i].first == elements[j].second) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//        }
-//        if (!found) {
-//            sum++;
-//            dominos[0].leftDots = elements[i].first;
-//            dominos[0].rightDots = elements[i].second;
-//
-//            elements.erase(elements.begin() + i);
-//        }
-//        if (sum > 1) return false;
-//    }
-//    for (int i = 1; i < dominos.size(); ++i) {
-//        int prev = dominos[i - 1].rightDots;
-////        if (freq[prev] == 1)
-//    }
-
-
-//    if (first){
-//        for (int i = 1; i < dominos.size(); ++i) {
-//            for (int j = 0; j < elements.size(); ++j) {
-//                if (elements[j].first == dominos[i-1].rightDots){
-//                    dominos[i].leftDots = elements[j].first;
-//                    dominos[i].rightDots = elements[j].second;
-//                    elements.erase(elements.begin()+i);
-//                }
-//            }
-//        }
-//    }
-//    else{
-//
-//    }
-
-//    for (int i = 0; i < elements.size(); ++i) {
-//        found = false;
-//        for (int j = 0; j < elements.size(); ++j) {
-//            if (i != j) {
-//                if (elements[i].second == elements[j].first) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//        }
-//        if (!found) {
-//            sum++;
-//            dominos[dominos.size() - 1].leftDots = elements[i].first;
-//            dominos[dominos.size() - 1].rightDots = elements[i].second;
-//            last = true;
-//            elements.erase(elements.begin()+i);
-//        }
-//        if (sum > 1) return false;
-//    }
 }
 
 void gameOfDominos() {
@@ -281,6 +230,7 @@ void gameOfDominos() {
     long long num, odd = 0;
     bool notInteger = true;
     int ele;
+
     cout << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Please enter number of dominos :";
@@ -334,7 +284,6 @@ void gameOfDominos() {
 
         notInteger = true;
         cout << "\nPlease enter the Right Dots in " << i + 1 << " dominos :";
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, element);
         while (notInteger) {
             notInteger = false;
@@ -363,7 +312,7 @@ void gameOfDominos() {
         if (it.second % 2 != 0) odd++;
     }
 
-    if (odd % 2 != 0) cout << "No, it is not possible to build a chain consisting of every domino in the vector.\n";
+    if (odd > 2) cout << "\nNo, it is not possible to build a chain consisting of every domino in the vector.\n";
     else {
         if (FormsDominoChain(dominos)) {
             cout << "Yes, it is possible to build a chain consisting of every domino in the vector.\n";
