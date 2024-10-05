@@ -11,6 +11,9 @@
 
 #include <bits/stdc++.h>
 #include <fstream>
+#include <locale>
+#include <io.h>   // For _setmode
+#include <fcntl.h> // For _O_U16TEXT
 
 using namespace std;
 
@@ -23,7 +26,7 @@ string enterProblem(vector<string> problems) {
         cout << i + 1 << " - " << problems[i] << endl;
     }
     cout << "Enter your answer :";
-    cin >> choiceProblems;
+    getline(cin, choiceProblems);
     return choiceProblems;
 }
 
@@ -34,7 +37,7 @@ string continueOrLeave(vector<string> stay) {
         cout << i + 1 << " - " << stay[i] << endl;
     }
     cout << "Enter your answer :";
-    cin >> starOrOut;
+    getline(cin, starOrOut);
     return starOrOut;
 }
 
@@ -45,7 +48,7 @@ string continueOrBack(vector<string> back) {
         cout << i + 1 << " - " << back[i] << endl;
     }
     cout << "Enter your answer :";
-    cin >> starOrBack;
+    getline(cin, starOrBack);
     return starOrBack;
 }
 
@@ -326,17 +329,105 @@ void gameOfDominos() {
 
 //======================================================================================================================
 
+wstring editMessage(wstring &message) {
+    wstring corrected;
+    bool found = false;
 
+    for (int i = 0; i < message.size(); ++i) {
+        if ((isspace(message[i]) && !found && i != 0) ||
+            (isspace(message[i]) && !found && i != 0 && message[i - 1] == '.') ||
+            (isspace(message[i]) && !found && i != 0 && message[i - 1] == ',')) {
+            corrected += L" ";
+            found = true;
+        } else if ((isspace(message[i]) && found) || (isspace(message[i]) && !found && i == 0)) continue;
+        else {
+            found = false;
+            corrected += message[i];
+        }
+    }
+
+    for (int i = 0; i < corrected.size(); ++i) {
+        if ((i == 0 && !isspace(corrected[i]))) {
+            if (isalpha(corrected[i])) corrected[i] = toupper(corrected[i]);
+        } else {
+            if (isalpha(corrected[i])) corrected[i] = tolower(corrected[i]);
+        }
+        if ((isspace(corrected[i]) && corrected[i + 1] == '.') ||
+            (isspace(corrected[i]) && corrected[i + 1] == ','))
+            corrected.erase(i, 1);
+        if ((!isspace(corrected[i + 1]) && corrected[i] == ',') ||
+            (!isspace(corrected[i + 1]) && corrected[i] == '.'))
+            corrected.insert(i + 1, 1, ' ');
+    }
+    return corrected;
+}
+
+void messageAlteringToAvoidCensorship() {
+    #ifdef _WIN32
+        system("chcp 65001");
+        _setmode(_fileno(stdout), _O_U16TEXT);  // Enable UTF-16 output
+        _setmode(_fileno(stdin), _O_U16TEXT);   // Enable UTF-16 input
+    #endif
+    locale::global(locale(""));
+    string enterOrRead;
+    wstring edited = L"", message, word;
+    vector<wstring> words;
+    vector<pair<wstring, wstring>> alternative = {{L"ثورة",   L"تغيير جذري"},
+                                                  {L"احتجاج", L"تعبير عن الرأي"},
+                                                  {L"حكومة",  L"السلطة التنفيذية"},
+                                                  {L"اعتقال", L"احتجاز"},
+                                                  {L"سجن",    L"مركز إصلاح"}};
+
+    cout << "\nDo you want to enter a message or read from a file ?\n";
+    cout << "1 - Enter a message.\n" << "2 - Read from a file.\n";
+    cout << "Enter your answer :";
+    getline(cin, enterOrRead);
+    while (enterOrRead != "1" && enterOrRead != "2") {
+        cout << "Please enter a correct choice !\n";
+        cout << "\nDo you want to enter a message or read from a file ?\n";
+        cout << "1 - Enter a message.\n" << "2 - Read from a file.\n";
+        cout << "Enter your answer :";
+        getline(cin, enterOrRead);
+    }
+    if (enterOrRead == "1") {
+        cout << "\nPlease enter the message to edit it :";
+        getline(wcin, message);
+        editMessage(message);
+        for (int i = 0; i < message.size(); ++i) {
+            if (isspace(message[i])) {
+                words.push_back(word);
+                word = L"";
+            } else word += message[i];
+        }
+        if (!word.empty()) {
+            words.push_back(word); // Add the last word
+        }
+        for (int i = 0; i < words.size(); ++i) {
+            for (int j = 0; j < alternative.size(); ++j) {
+                if (words[i] == alternative[j].first) words[i] = alternative[j].second;
+            }
+        }
+        for (int i = 0; i < words.size(); ++i) {
+            edited += words[i];
+            edited += L" ";
+        }
+        cout << "The edited message is : ";
+        wcout << editMessage(message) << endl;
+    } else {
+
+    }
+}
 
 //======================================================================================================================
 
 int main() {
     bool firstTime = false;
-    cout << "Welcome to my program, This program includes\n" << "solutions for some problems.\n";
+    cout << "Welcome To My Program, This Program Includes\n" << "Solutions For Some Problems.\n";
 
     vector<string> stay = {"Continue", "Exit"};
     vector<string> back = {"Continue", "Back"};
-    vector<string> problems = {"Correct a Sentence.", "generate a list of primes.", "The game of dominos.", "", "Exit"};
+    vector<string> problems = {"Correct A Sentence.", "generate A List Of Primes.", "The Game Of Dominos.",
+                               "Message Altering to Avoid Censorship.", "Exit"};
     while (true) {
         if (firstTime) {
             string starOrOut = continueOrLeave(stay);
@@ -401,7 +492,7 @@ int main() {
                 firstTime = true;
                 continue;
             } else if (starOrBack == "1") {
-
+                messageAlteringToAvoidCensorship();
             }
         } else if (choiceProblems == "5") {
             break;
