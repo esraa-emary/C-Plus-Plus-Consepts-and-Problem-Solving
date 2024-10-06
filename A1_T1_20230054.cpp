@@ -14,7 +14,8 @@
 #include <locale>
 #include <io.h>   // For _setmode
 #include <fcntl.h> // For _O_U16TEXT
-#include <fstream>
+#include <codecvt>
+#include <sstream>
 
 using namespace std;
 
@@ -66,9 +67,9 @@ void correctSentence() {
     while (true) {
         getline(cin, sentence);
         for (int i = 0; i < sentence.size(); ++i) {
-            if (sentence[i] == '.'){
-                found= true;
-                sentence.erase(i+1,sentence.size()-i-1);
+            if (sentence[i] == '.') {
+                found = true;
+                sentence.erase(i + 1, sentence.size() - i - 1);
                 holeSentence += sentence;
             }
         }
@@ -378,66 +379,81 @@ wstring editMessage(wstring &message) {
 void messageAlteringToAvoidCensorship() {
     _setmode(_fileno(stdout), _O_U16TEXT);  // Enable UTF-16 output
     _setmode(_fileno(stdin), _O_U16TEXT);   // Enable UTF-16 input
-
     locale::global(locale(""));
-    wstring edited = L"", message, word, enterOrRead;
+
+    wstring edited = L"", message = L"", word=L"", enterOrRead, wfileName;
+    string fileName = "", fileContent = "", result = "";
+    bool found = true;
     vector<wstring> words;
-    vector<pair<wstring, wstring>> alternative;
+    vector<wstring> bias = {L"ثورة", L"احتجاج", L"اعتقال", L"حكومة", L"سجن"};
+    vector<wstring> alternative = {L"تغيير جذري", L"تعبير عن الرأي", L"احتجاز", L"السلطة التنفيذية", L"مركز إصلاح"};
 
-//                                                  {L"احتجاج", L"تعبير عن الرأي"},
-//                                                  {L"حكومة",  L"السلطة التنفيذية"},
-//                                                  {L"اعتقال", L"احتجاز"},
-//                                                  {L"سجن",    L"مركز إصلاح"}};
-
-
-    alternative.push_back(make_pair(L"ثورة", L"تغيير جذري"));
     wcout << L"\n=====>This part gets a message and replace some words (if exist) with another ones.<=====\n";
-    wcout << L"\nThe file name should be (file name).txt\n";
-    
-    
-    
-    wcout << L"\nDo you want to enter a message or read from a file?\n";
-    wcout << L"1 - Enter a message.\n" << L"2 - Read from a file.\n";
-    wcout << L"Enter your answer:";
-    getline(wcin, enterOrRead);
-    while (enterOrRead != L"1" && enterOrRead != L"2") {
-        wcout << L"Please enter a correct choice!\n";
-        wcout << L"\nDo you want to enter a message or read from a file?\n";
-        wcout << L"1 - Enter a message.\n" << L"2 - Read from a file.\n";
-        wcout << L"Enter your answer:";
-        cout << endl;
-        cout << endl;
-        getline(wcin, enterOrRead);
+    wcout << L"\nThe file name should be like this ----> (file name).txt\n";
+    wcout << L"Enter file name :";
+    while (found) {
+        fileName = "";
+        getline(wcin, wfileName);
+        if (wfileName.substr(wfileName.size() - 4, 4) != L".txt") {
+            wcout << L"\nThe file name should be like this ----> (file name).txt\n";
+            wcout << L"Please enter a valid file name :";
+            wcin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+        for (int i = 0; i < wfileName.size(); ++i) {
+            fileName += wfileName[i];
+        }
+        fstream file(fileName, ios::in);
+        if (!file.good()) {
+            wcout << L"\nThis file does not exist.\n";
+            wcout << L"\nThe file name should be like this ----> (file name).txt\n";
+            wcout << L"Please enter a valid file name :";
+            wcin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+        stringstream content;
+        content << file.rdbuf();
+        fileContent = content.str();
+        found = false;
     }
-    if (enterOrRead == L"1") {
-        wcout << L"\nPlease enter the message to edit it :";
-        wcout << endl;
-        wcin.ignore(numeric_limits<streamsize>::max(), '\n');
-        getline(wcin, message);
-        editMessage(message);
-        for (int i = 0; i < message.size(); ++i) {
-            if (isspace(message[i])) {
-                words.push_back(word);
-                word = L"";
-            } else word += message[i];
-        }
-        if (!word.empty()) {
-            words.push_back(word); // Add the last word
-        }
-        for (int i = 0; i < words.size(); ++i) {
-            for (int j = 0; j < alternative.size(); ++j) {
-                if (words[i] == alternative[j].first) words[i] = alternative[j].second;
+    for (int i = 0; i < fileContent.size(); ++i) {
+        message += fileContent[i];
+    }
+    message = editMessage(message);
+
+
+    for (int i = 0; i < message.size(); ++i) {
+        if (isspace(message[i]) || message[i] == '.' || message[i] == ',') {
+            words.push_back(word);
+            word = L"";
+            if (message[i] == '.') words.push_back(L".");
+            else if (message[i] == ',') words.push_back(L",");
+        } else word += message[i];
+    }
+    if (!word.empty()) words.push_back(word);
+
+    for (int i = 0; i < words.size(); ++i) {
+        for (int j = 0; j < bias.size(); ++j) {
+            if (words[i] == bias[j]) {
+                words[i] = alternative[j];
+                break;
             }
         }
-        for (int i = 0; i < words.size(); ++i) {
-            edited += words[i];
-            edited += L" ";
-        }
-        wcout << L"The edited message is : ";
-        wcout << editMessage(message) << endl;
-    } else {
-
     }
+    for (const auto& w : words) {
+        edited += w + L" ";
+    }
+
+
+    message = editMessage(message);
+    for (int i = 0; i < message.size(); ++i) {
+        result += message[i];
+    }
+
+    fstream outFile(fileName, ios::out | ios::trunc);
+    outFile << result;
+    outFile.close();
+    wcout << L"File edited successfully!\n";
 }
 
 //======================================================================================================================
