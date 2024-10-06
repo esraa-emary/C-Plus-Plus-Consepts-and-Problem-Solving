@@ -22,6 +22,8 @@ using namespace std;
 //======================================================================================================================
 
 string enterProblem(vector<string> problems) {
+    _setmode(_fileno(stdout), _O_TEXT);
+    _setmode(_fileno(stdin), _O_TEXT);
     string choiceProblems;
     cout << "\nWhich problem you want to solve ?\n";
     for (int i = 0; i < problems.size(); ++i) {
@@ -33,6 +35,8 @@ string enterProblem(vector<string> problems) {
 }
 
 string continueOrLeave(vector<string> stay) {
+    _setmode(_fileno(stdout), _O_TEXT);
+    _setmode(_fileno(stdin), _O_TEXT);
     string starOrOut;
     cout << "\nDo you want to continue or exit ?\n";
     for (int i = 0; i < stay.size(); ++i) {
@@ -44,6 +48,8 @@ string continueOrLeave(vector<string> stay) {
 }
 
 string continueOrBack(vector<string> back) {
+    _setmode(_fileno(stdout), _O_TEXT);
+    _setmode(_fileno(stdin), _O_TEXT);
     string starOrBack;
     cout << "\nDo you want to continue or back ?\n";
     for (int i = 0; i < back.size(); ++i) {
@@ -57,6 +63,8 @@ string continueOrBack(vector<string> back) {
 //======================================================================================================================
 
 void correctSentence() {
+    _setmode(_fileno(stdout), _O_TEXT);
+    _setmode(_fileno(stdin), _O_TEXT);
     string corrected, sentence, holeSentence = "";
     bool found = false;
 
@@ -111,6 +119,8 @@ void correctSentence() {
 //======================================================================================================================
 
 void getPrimes() {
+    _setmode(_fileno(stdout), _O_TEXT);
+    _setmode(_fileno(stdin), _O_TEXT);
     string number;
     long long num;
     vector<long long> numbers;
@@ -210,6 +220,8 @@ struct dominoT {
 };
 
 bool FormsDominoChain(vector<dominoT> &dominos) {
+    _setmode(_fileno(stdout), _O_TEXT);
+    _setmode(_fileno(stdin), _O_TEXT);
     static int start = 0;
     vector<int> fi, la;
     int first, second;
@@ -239,6 +251,8 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
 }
 
 void gameOfDominos() {
+    _setmode(_fileno(stdout), _O_TEXT);
+    _setmode(_fileno(stdin), _O_TEXT);
     string number, element;
     map<long long, long long> freq;
     long long num, odd = 0;
@@ -381,12 +395,20 @@ void messageAlteringToAvoidCensorship() {
     _setmode(_fileno(stdin), _O_U16TEXT);   // Enable UTF-16 input
     locale::global(locale(""));
 
-    wstring edited = L"", message = L"", word=L"", enterOrRead, wfileName;
-    string fileName = "", fileContent = "", result = "";
+    std::wstringstream content;
+    wstring edited = L"", message = L"", word = L"", enterOrRead, wfileName;
+    string fileName;
     bool found = true;
     vector<wstring> words;
-    vector<wstring> bias = {L"ثورة", L"احتجاج", L"اعتقال", L"حكومة", L"سجن"};
-    vector<wstring> alternative = {L"تغيير جذري", L"تعبير عن الرأي", L"احتجاز", L"السلطة التنفيذية", L"مركز إصلاح"};
+    vector<wstring> bias = {L"ثورة", L"احتجاج", L"اعتقال", L"حكومة", L"سجن", L"معارضة", L"ارهاب", L"حرب", L"انقلاب",
+                            L"شهيد", L"مظاهرة", L"ديكتاتور", L"اغتيال", L"العقوبات", L"انفجار", L"تنظيم", L"تعذيب",
+                            L"عدو", L"حظر", L"فساد", L"عصيان", L"نفي", L"اعتداء", L"ارهاب"};
+
+    vector<wstring> alternative = {L"تغيير جذري", L"تعبير عن الرأي", L"احتجاز", L"السلطة التنفيذية", L"مركز إصلاح",
+                                   L"تيار مختلف", L"العتف المنظم", L"نزاع مسلح", L"تغيير غير دستوري", L"ضحية النزاع",
+                                   L"تجمع سلمي", L"حاكم مستبد", L"تصفية مستهدفة", L"قيود اقتصادية", L"حادث مدمر",
+                                   L"مجموعة منظمة", L"إساءة المعاملة", L"طرف مخالف", L"قيود", L"سوء الإدارة",
+                                   L"عدم الامتثال", L"إبعاد قسري", L"تجاوز جسدي", L"معارضة مسلحة"};
 
     wcout << L"\n=====>This part gets a message and replace some words (if exist) with another ones.<=====\n";
     wcout << L"\nThe file name should be like this ----> (file name).txt\n";
@@ -403,7 +425,7 @@ void messageAlteringToAvoidCensorship() {
         for (int i = 0; i < wfileName.size(); ++i) {
             fileName += wfileName[i];
         }
-        fstream file(fileName, ios::in);
+        wifstream file(fileName);
         if (!file.good()) {
             wcout << L"\nThis file does not exist.\n";
             wcout << L"\nThe file name should be like this ----> (file name).txt\n";
@@ -411,16 +433,12 @@ void messageAlteringToAvoidCensorship() {
             wcin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
-        stringstream content;
+        file.imbue(std::locale(file.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
         content << file.rdbuf();
-        fileContent = content.str();
         found = false;
     }
-    for (int i = 0; i < fileContent.size(); ++i) {
-        message += fileContent[i];
-    }
+    message = content.str();
     message = editMessage(message);
-
 
     for (int i = 0; i < message.size(); ++i) {
         if (isspace(message[i]) || message[i] == '.' || message[i] == ',') {
@@ -440,25 +458,22 @@ void messageAlteringToAvoidCensorship() {
             }
         }
     }
-    for (const auto& w : words) {
+    for (const auto &w: words) {
         edited += w + L" ";
     }
-
-
-    message = editMessage(message);
-    for (int i = 0; i < message.size(); ++i) {
-        result += message[i];
-    }
-
-    fstream outFile(fileName, ios::out | ios::trunc);
-    outFile << result;
+    wofstream outFile(fileName, std::ios::out | std::ios::trunc);
+    outFile.imbue(std::locale(outFile.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
+    outFile << edited;
     outFile.close();
     wcout << L"File edited successfully!\n";
+    wcin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
 //======================================================================================================================
 
 int main() {
+    _setmode(_fileno(stdout), _O_TEXT);
+    _setmode(_fileno(stdin), _O_TEXT);
     bool firstTime = false;
     cout << "Welcome To My Program, This Program Includes\n" << "Solutions For Some Problems.\n";
 
