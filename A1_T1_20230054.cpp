@@ -14,6 +14,7 @@
 #include <locale>
 #include <io.h>   // For _setmode
 #include <fcntl.h> // For _O_U16TEXT
+#include <fstream>
 
 using namespace std;
 
@@ -58,17 +59,27 @@ void correctSentence() {
     string corrected, sentence, holeSentence = "";
     bool found = false;
 
-    cout << "\nThis part of my program gets a sentence and correct is.\n";
+    cout << "\n=====>This part gets a sentence and correct is.<=====\n";
     cout << "\nEnter the sentence you want to correct :";
     cout << endl;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     while (true) {
         getline(cin, sentence);
-        holeSentence += sentence;
-        if (sentence[sentence.size() - 1] == '.') break;
-        else holeSentence += ' ';
+        for (int i = 0; i < sentence.size(); ++i) {
+            if (sentence[i] == '.'){
+                found= true;
+                sentence.erase(i+1,sentence.size()-i-1);
+                holeSentence += sentence;
+            }
+        }
+        if (found) break;
+        else {
+            holeSentence += sentence;
+            holeSentence += ' ';
+        }
     }
 
+    found = false;
     for (int i = 0; i < holeSentence.size(); ++i) {
         if ((isspace(holeSentence[i]) && !found && i != 0) ||
             (isspace(holeSentence[i]) && !found && i != 0 && holeSentence[i - 1] == '.') ||
@@ -93,7 +104,7 @@ void correctSentence() {
             corrected.erase(i, 1);
         if ((!isspace(corrected[i + 1]) && corrected[i] == ',')) corrected.insert(i + 1, 1, ' ');
     }
-    cout << "The corrected sentence is : " << corrected << endl;
+    cout << "\nThe corrected sentence is : " << corrected << endl;
 }
 
 //======================================================================================================================
@@ -103,9 +114,8 @@ void getPrimes() {
     long long num;
     vector<long long> numbers;
     vector<long long> crossed;
-    bool notInteger = false, change = false;
-    cout << endl;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    bool notInteger = false, change;
+    cout << "\n=====>This part gets an positive integer number and print primes from 2 to it.<=====\n\n";
     cout << "Please enter a positive integer number to get primes from 2 to it :";
     getline(cin, number);
     for (int i = 0; i < number.size(); ++i) {
@@ -236,6 +246,7 @@ void gameOfDominos() {
 
     cout << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "\n=====>This part gets number of dominos and if possible to form a chain.<=====\n";
     cout << "Please enter number of dominos :";
     getline(cin, number);
     while (notInteger) {
@@ -330,6 +341,8 @@ void gameOfDominos() {
 //======================================================================================================================
 
 wstring editMessage(wstring &message) {
+    _setmode(_fileno(stdout), _O_U16TEXT);  // Enable UTF-16 output
+    _setmode(_fileno(stdin), _O_U16TEXT);   // Enable UTF-16 input
     wstring corrected;
     bool found = false;
 
@@ -363,34 +376,43 @@ wstring editMessage(wstring &message) {
 }
 
 void messageAlteringToAvoidCensorship() {
-    #ifdef _WIN32
-        system("chcp 65001");
-        _setmode(_fileno(stdout), _O_U16TEXT);  // Enable UTF-16 output
-        _setmode(_fileno(stdin), _O_U16TEXT);   // Enable UTF-16 input
-    #endif
-    locale::global(locale(""));
-    string enterOrRead;
-    wstring edited = L"", message, word;
-    vector<wstring> words;
-    vector<pair<wstring, wstring>> alternative = {{L"ثورة",   L"تغيير جذري"},
-                                                  {L"احتجاج", L"تعبير عن الرأي"},
-                                                  {L"حكومة",  L"السلطة التنفيذية"},
-                                                  {L"اعتقال", L"احتجاز"},
-                                                  {L"سجن",    L"مركز إصلاح"}};
+    _setmode(_fileno(stdout), _O_U16TEXT);  // Enable UTF-16 output
+    _setmode(_fileno(stdin), _O_U16TEXT);   // Enable UTF-16 input
 
-    cout << "\nDo you want to enter a message or read from a file ?\n";
-    cout << "1 - Enter a message.\n" << "2 - Read from a file.\n";
-    cout << "Enter your answer :";
-    getline(cin, enterOrRead);
-    while (enterOrRead != "1" && enterOrRead != "2") {
-        cout << "Please enter a correct choice !\n";
-        cout << "\nDo you want to enter a message or read from a file ?\n";
-        cout << "1 - Enter a message.\n" << "2 - Read from a file.\n";
-        cout << "Enter your answer :";
-        getline(cin, enterOrRead);
+    locale::global(locale(""));
+    wstring edited = L"", message, word, enterOrRead;
+    vector<wstring> words;
+    vector<pair<wstring, wstring>> alternative;
+
+//                                                  {L"احتجاج", L"تعبير عن الرأي"},
+//                                                  {L"حكومة",  L"السلطة التنفيذية"},
+//                                                  {L"اعتقال", L"احتجاز"},
+//                                                  {L"سجن",    L"مركز إصلاح"}};
+
+
+    alternative.push_back(make_pair(L"ثورة", L"تغيير جذري"));
+    wcout << L"\n=====>This part gets a message and replace some words (if exist) with another ones.<=====\n";
+    wcout << L"\nThe file name should be (file name).txt\n";
+    
+    
+    
+    wcout << L"\nDo you want to enter a message or read from a file?\n";
+    wcout << L"1 - Enter a message.\n" << L"2 - Read from a file.\n";
+    wcout << L"Enter your answer:";
+    getline(wcin, enterOrRead);
+    while (enterOrRead != L"1" && enterOrRead != L"2") {
+        wcout << L"Please enter a correct choice!\n";
+        wcout << L"\nDo you want to enter a message or read from a file?\n";
+        wcout << L"1 - Enter a message.\n" << L"2 - Read from a file.\n";
+        wcout << L"Enter your answer:";
+        cout << endl;
+        cout << endl;
+        getline(wcin, enterOrRead);
     }
-    if (enterOrRead == "1") {
-        cout << "\nPlease enter the message to edit it :";
+    if (enterOrRead == L"1") {
+        wcout << L"\nPlease enter the message to edit it :";
+        wcout << endl;
+        wcin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(wcin, message);
         editMessage(message);
         for (int i = 0; i < message.size(); ++i) {
@@ -411,7 +433,7 @@ void messageAlteringToAvoidCensorship() {
             edited += words[i];
             edited += L" ";
         }
-        cout << "The edited message is : ";
+        wcout << L"The edited message is : ";
         wcout << editMessage(message) << endl;
     } else {
 
