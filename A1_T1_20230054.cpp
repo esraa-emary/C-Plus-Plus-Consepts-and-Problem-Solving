@@ -18,7 +18,7 @@
 // right number for each domino then if it is possible to make a chain with dominos it makes it
 // and print it otherwise it print no.
 
-// If you choose fourth problem it will ask you to enter file name then it will replace some 
+// If you choose fourth problem it will ask you to enter file name then it will replace some
 // words in it (if exist) with other words then return them in the file.
 
 //======================================================================================================================
@@ -40,7 +40,7 @@ string enterProblem(vector<string> problems) {
     _setmode(_fileno(stdin), _O_TEXT);          // for handle using just ascii.
     string choiceProblems;
     cout << "\nWhich problem you want to solve ?\n";
-    for (int i = 0; i < problems.size(); ++i) {                     
+    for (int i = 0; i < problems.size(); ++i) {
         cout << i + 1 << " - " << problems[i] << endl;               // print choices for problem to choose and solve.
     }
     cout << "Enter your answer :";
@@ -53,7 +53,7 @@ string continueOrLeave(vector<string> stay) {
     _setmode(_fileno(stdin), _O_TEXT);          // for handle using just ascii.
     string starOrOut;
     cout << "\nDo you want to continue or exit ?\n";
-    for (int i = 0; i < stay.size(); ++i) {         
+    for (int i = 0; i < stay.size(); ++i) {
         cout << i + 1 << " - " << stay[i] << endl;                   // print choices for continue or exit program.
     }
     cout << "Enter your answer :";
@@ -97,7 +97,7 @@ void correctSentence() {
         }
         if (found) break;
         else {
-            holeSentence += sentence;                                 // put all lines in a new variable and handle it as a sentence. 
+            holeSentence += sentence;                                 // put all lines in a new variable and handle it as a sentence.
             holeSentence += ' ';
         }
     }
@@ -123,7 +123,7 @@ void correctSentence() {
             if (isalpha(corrected[i])) corrected[i] = tolower(corrected[i]);
         }
         if ((isspace(corrected[i]) && corrected[i + 1] == '.') ||
-            (isspace(corrected[i]) && corrected[i + 1] == ','))      
+            (isspace(corrected[i]) && corrected[i + 1] == ','))
             corrected.erase(i, 1);                           // if there is a space before "." or "," remove it.
         if ((!isspace(corrected[i + 1]) && corrected[i] == ',')) corrected.insert(i + 1, 1, ' ');
     }
@@ -140,7 +140,7 @@ void getPrimes() {
     vector<long long> numbers;
     vector<long long> crossed;
     bool notInteger = true, change;
-    
+
     cout << "\n=====>This part gets an positive integer number and print primes from 2 to it.<=====\n\n";
     cout << "Please enter a positive integer number to get primes from 2 to it :";
     getline(cin, number);
@@ -163,9 +163,9 @@ void getPrimes() {
             getline(cin, number);
         }
     }
-    num = stoll(number);     
+    num = stoll(number);
     for (int i = 2; i <= num; ++i) numbers.push_back(i);            // put all numbers from 2 to the entered number in a vector.
-                                                                    // then put primes in a vector and others in another vector.    
+                                                                    // then put primes in a vector and others in another vector.
     for (int i = 0; i < numbers.size(); ++i) {
         change = false;
         for (int j = 0; j < numbers.size(); ++j) {
@@ -175,18 +175,18 @@ void getPrimes() {
             }
         }
         if (change) {
-            for (int j = 2; j <= num; ++j) {                        // add deleted numbers in crossed vector.    
+            for (int j = 2; j <= num; ++j) {                        // add deleted numbers in crossed vector.
                 auto it = find(numbers.begin(), numbers.end(), j);
                 if (it != numbers.end()) continue;
                 else crossed.push_back(j);
             }
-                                                                     // print circled numbers(primes) every step.           
+                                                                     // print circled numbers(primes) every step.
             cout << "\nThe circled numbers(primes) in " << i + 1 << " are : ";
             for (int j = 0; j < numbers.size(); ++j) {
-                if (j != numbers.size() - 1) cout << numbers[j] << ',';         
+                if (j != numbers.size() - 1) cout << numbers[j] << ',';
                 else cout << numbers[j];
             }
-                                                                    // print crossed-out numbers(not prime) every step.  
+                                                                    // print crossed-out numbers(not prime) every step.
             cout << "\n\nThe crossed-out numbers(not prime) in " << i + 1 << " are : ";
             for (int j = 0; j < crossed.size(); ++j) {
                 if (j != crossed.size() - 1) cout << crossed[j] << ',';
@@ -227,7 +227,7 @@ struct dominoT {
 bool FormsDominoChain(vector<dominoT> &dominos) {
     _setmode(_fileno(stdout), _O_TEXT);         // for handle using just ascii .
     _setmode(_fileno(stdin), _O_TEXT);          // for handle using just ascii .
-    static int start = 0, odd = 0, first, last; 
+    static int start = 0, odd = 0, first, last;
     static vector<int> fi, la, fi2, la2;
     static deque<int> arrange;
     map<int, int> freq;
@@ -235,7 +235,7 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
     vector<pair<int, int>> recoFirst, recoSecond;
 
     if (start == 0) {
-        for (int i = 0; i < dominos.size(); ++i) {                   // make 4 vectors fi,fi2,la,la2 and put dominos in it. 
+        for (int i = 0; i < dominos.size(); ++i) {                   // make 4 vectors fi,fi2,la,la2 and put dominos in it.
             fi.push_back(dominos[i].leftDots);
             la.push_back(dominos[i].rightDots);
             fi2.push_back(dominos[i].leftDots);
@@ -249,7 +249,7 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
                 odds.push_back(it.first);
             }
         }
-        if (odd > 2) return false;                                  //  if odd > 2 this mean that its impossible to make a chain. 
+        if (odd > 2) return false;                                  //  if odd > 2 this mean that its impossible to make a chain.
         if (odd == 0) arrange.push_back(0);                     // if odd = 0 there is no need to check anything just start with any one.
         else {                                                     // if odd = 2 i have to know which domino will be at first and which at end of chain.
             auto it = find(fi.begin(), fi.end(), odds[0]);
@@ -266,8 +266,8 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
                         }
                     }
                 }
-                for (int i = 0; i < la2.size(); ++i) {           // loop to know which domino will be at end of chain.   
-                    if (la2[i] == odds[1] && arrange[0] != i) {         
+                for (int i = 0; i < la2.size(); ++i) {           // loop to know which domino will be at end of chain.
+                    if (la2[i] == odds[1] && arrange[0] != i) {
                         auto r = find(la.begin(), la.end(), fi2[i]);
                         if (r != la.end()) {
                             last = i;
@@ -293,7 +293,7 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
                     }
                 }
                 for (int i = 0; i < la2.size(); ++i) {          // loop to know which domino will be at end of chain.
-                    if (la2[i] == odds[1] && arrange[0] != i) {             
+                    if (la2[i] == odds[1] && arrange[0] != i) {
                         auto r = find(la.begin(), la.end(), fi2[i]);
                         if (r != la.end()) {
                             last = i;
@@ -307,7 +307,7 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
                 la[last] = -1;
             }
         }                                                       // put base case.
-    } else if ((start == dominos.size() && odd == 0) || (start == dominos.size() - 1 && odd != 0)) {    
+    } else if ((start == dominos.size() && odd == 0) || (start == dominos.size() - 1 && odd != 0)) {
         if (odd != 0) arrange.push_back(last);              // if odd > 0 add last to arrange.
         int y = 0;
         for (auto &it: dominos) {
@@ -373,8 +373,8 @@ void gameOfDominos() {
     num = stoll(number);
     vector<dominoT> dominos(num);
 
-    for (long long i = 0; i < num; ++i) {                   
-        cout << "\nPlease enter the Left Dots in " << i + 1 << " dominos :";    
+    for (long long i = 0; i < num; ++i) {
+        cout << "\nPlease enter the Left Dots in " << i + 1 << " dominos :";
         getline(cin, element);                              // get left number of each domino.
         while (element != "0" && element != "1" && element != "2" && element != "3" && element != "4" &&
                element != "5" && element != "6") {
@@ -454,10 +454,10 @@ void messageAlteringToAvoidCensorship() {
     vector<wstring> bias = {L"ثورة", L"احتجاج", L"اعتقال", L"حكومة", L"سجن", L"معارضة", L"ارهاب", L"حرب", L"انقلاب",
                             L"شهيد", L"مظاهرة", L"ديكتاتور", L"اغتيال", L"العقوبات", L"انفجار", L"تنظيم", L"تعذيب",
                             L"عدو", L"حظر", L"فساد", L"عصيان", L"نفي", L"اعتداء", L"ارهاب"};
-    
-                                                                      // replacement words.          
+
+                                                                      // replacement words.
     vector<wstring> alternative = {L"تغيير جذري", L"تعبير عن الرأي", L"احتجاز", L"السلطة التنفيذية", L"مركز إصلاح",
-                                   L"تيار مختلف", L"العتف المنظم", L"نزاع مسلح", L"تغيير غير دستوري", L"ضحية النزاع",
+                                   L"تيار مختلف", L"العنف المنظم", L"نزاع مسلح", L"تغيير غير دستوري", L"ضحية النزاع",
                                    L"تجمع سلمي", L"حاكم مستبد", L"تصفية مستهدفة", L"قيود اقتصادية", L"حادث مدمر",
                                    L"مجموعة منظمة", L"إساءة المعاملة", L"طرف مخالف", L"قيود", L"سوء الإدارة",
                                    L"عدم الامتثال", L"إبعاد قسري", L"تجاوز جسدي", L"معارضة مسلحة"};
