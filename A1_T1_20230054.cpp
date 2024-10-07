@@ -125,26 +125,12 @@ void getPrimes() {
     long long num;
     vector<long long> numbers;
     vector<long long> crossed;
-    bool notInteger = false, change;
+    bool notInteger = true, change;
     cout << "\n=====>This part gets an positive integer number and print primes from 2 to it.<=====\n\n";
     cout << "Please enter a positive integer number to get primes from 2 to it :";
     getline(cin, number);
-    for (int i = 0; i < number.size(); ++i) {
-        if (number[i] != '0' && number[i] != '1' && number[i] != '2' && number[i] != '3' && number[i] != '4' &&
-            number[i] != '5' && number[i] != '6' && number[i] != '7' && number[i] != '8' && number[i] != '9') {
-            notInteger = true;
-            break;
-        }
-    }
-    if (!notInteger) {
-        num = stoll(number);
-        if (num < 2) notInteger = true;
-    }
     while (notInteger) {
         notInteger = false;
-        cout << endl;
-        cout << "Please enter a correct positive integer number :";
-        getline(cin, number);
         for (int i = 0; i < number.size(); ++i) {
             if (number[i] != '0' && number[i] != '1' && number[i] != '2' && number[i] != '3' && number[i] != '4' &&
                 number[i] != '5' && number[i] != '6' && number[i] != '7' && number[i] != '8' && number[i] != '9') {
@@ -152,9 +138,14 @@ void getPrimes() {
                 break;
             }
         }
+        if (number.empty()) notInteger = true;
         if (!notInteger) {
             num = stoll(number);
             if (num < 2) notInteger = true;
+        }
+        if (notInteger) {
+            cout << "\nPlease enter a correct positive integer number :";
+            getline(cin, number);
         }
     }
     num = stoll(number);
@@ -222,29 +213,154 @@ struct dominoT {
 bool FormsDominoChain(vector<dominoT> &dominos) {
     _setmode(_fileno(stdout), _O_TEXT);
     _setmode(_fileno(stdin), _O_TEXT);
-    static int start = 0;
-    vector<int> fi, la;
-    int first, second;
-    deque<int> arrange;
+    static int start = 0, odd = 0, first, last;
+    static vector<int> fi, la, fi2, la2;
+    static deque<int> arrange;
+    map<int, int> freq;
+    vector<int> odds;
+    vector<pair<int, int>> recoFirst, recoSecond;
 
-    for (int i = 0; i < dominos.size() && start == 1; ++i) {
-        fi.push_back(dominos[i].leftDots);
-        la.push_back(dominos[i].rightDots);
-    }
-
-    if (start == 0) arrange.push_back(0);
-    else if (start == dominos.size() - 1) {
-        first = dominos[start - 1].rightDots;
-        auto it = find(fi.begin(), fi.end(), first);
-        if (it != fi.end()) arrange.push_back(it - fi.begin());
+    if (start == 0) {
         for (int i = 0; i < dominos.size(); ++i) {
-            dominos[i].leftDots = fi[arrange[i]];
-            dominos[i].rightDots = la[arrange[i]];
+            fi.push_back(dominos[i].leftDots);
+            la.push_back(dominos[i].rightDots);
+            fi2.push_back(dominos[i].leftDots);
+            la2.push_back(dominos[i].rightDots);
+            freq[dominos[i].leftDots]++;
+            freq[dominos[i].rightDots]++;
         }
+        for (auto it: freq) {
+            if (it.second % 2 != 0) {
+                odd++;
+                odds.push_back(it.first);
+            }
+        }
+        if (odd > 2) return false;
+        if (odd == 0) arrange.push_back(0);
+        else {
+            auto it = find(fi.begin(), fi.end(), odds[0]);
+            if (it != fi.end()) {
+                first = it - fi.begin();
+                auto it2 = find(la.begin(), la.end(), odds[1]);
+                if (it2 != la.end()) last = it2 - la.begin();
+                else return false;
+                for (int i = 0; i < fi2.size(); ++i) {
+                    if (fi2[i] == odds[0]) {
+                        fi[i] = -1;
+                        la[i] = -1;
+                        auto r = find(fi.begin(), fi.end(), la2[i]);
+                        if (r != fi.end()) {
+                            first = r - fi.begin();
+                            break;
+                        }
+                        else{
+                            for (int j = 0; j < fi.size(); ++j) {
+                                fi[j]=fi2[j];
+                                la[j]=la2[j];
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < fi.size(); ++i) {
+                    fi[i]=fi2[i];
+                    la[i]=la2[i];
+                }
+                for (int i = 0; i < la2.size(); ++i) {
+                    if (la2[i] == odds[1]) {
+                        fi[i] = -1;
+                        la[i] = -1;
+                        auto r = find(la.begin(), la.end(), fi2[i]);
+                        if (r != la.end()) {
+                            last = r - la.begin();
+                            break;
+                        }
+                        else{
+                            for (int j = 0; j < fi.size(); ++j) {
+                                fi[j]=fi2[j];
+                                la[j]=la2[j];
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < fi.size(); ++i) {
+                    fi[i]=fi2[i];
+                    la[i]=la2[i];
+                }
+                fi[first] = -1;
+                la[first] = -1;
+                fi[last] = -1;
+                la[last] = -1;
+                arrange.push_back(first);
+            } else {
+                last = it - fi.begin();
+                auto it2 = find(la.begin(), la.end(), odds[1]);
+                if (it2 != la.end()) first = odds[1];
+                else return false;
+                for (int i = 0; i < fi2.size(); ++i) {
+                    if (fi2[i] == odds[0]) {
+                        fi[i] = -1;
+                        la[i] = -1;
+                        auto r = find(fi.begin(), fi.end(), la2[i]);
+                        if (r != fi.end()) {
+                            first = r - fi.begin();
+                            break;
+                        }
+                        else{
+                            for (int j = 0; j < fi.size(); ++j) {
+                                fi[j]=fi2[j];
+                                la[j]=la2[j];
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < fi.size(); ++i) {
+                    fi[i]=fi2[i];
+                    la[i]=la2[i];
+                }
+                for (int i = 0; i < la2.size(); ++i) {
+                    if (la2[i] == odds[1]) {
+                        fi[i] = -1;
+                        la[i] = -1;
+                        auto r = find(la.begin(), la.end(), fi2[i]);
+                        if (r != la.end()) {
+                            last = r - la.begin();
+                            break;
+                        }
+                        else{
+                            for (int j = 0; j < fi.size(); ++j) {
+                                fi[j]=fi2[j];
+                                la[j]=la2[j];
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < fi.size(); ++i) {
+                    fi[i]=fi2[i];
+                    la[i]=la2[i];
+                }
+                fi[first] = -1;
+                la[first] = -1;
+                fi[last] = -1;
+                la[last] = -1;
+                arrange.push_back(it2 - la.begin());
+            }
+        }
+    } else if ((start == dominos.size() && odd == 0) || (start == dominos.size() - 1 && odd != 0)) {
+        if (odd != 0) arrange.push_back(last);
+        int y = 0;
+        for (auto &it: dominos) {
+            it.leftDots = fi2[arrange[y]];
+            it.rightDots = la2[arrange[y]];
+            y++;
+        }
+        return true;
     } else {
-        first = dominos[start - 1].rightDots;
-        auto it = find(fi.begin(), fi.end(), first);
-        if (it != fi.end()) arrange.push_back(it - fi.begin());
+        auto it = find(fi.begin(), fi.end(), la2[arrange[start - 1]]);
+        if (it != fi.end()) {
+            arrange.push_back(it - fi.begin());
+            fi[it - fi.begin()] = -1;
+            la[it - fi.begin()] = -1;
+        } else return false;
     }
     start++;
     return FormsDominoChain(dominos);
@@ -254,25 +370,23 @@ void gameOfDominos() {
     _setmode(_fileno(stdout), _O_TEXT);
     _setmode(_fileno(stdin), _O_TEXT);
     string number, element;
-    map<long long, long long> freq;
-    long long num, odd = 0;
+    long long num;
     bool notInteger = true;
     int ele;
 
-    cout << endl;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "\n=====>This part gets number of dominos and if possible to form a chain.<=====\n";
-    cout << "Please enter number of dominos :";
+    cout << "\nPlease enter number of dominos :";
     getline(cin, number);
     while (notInteger) {
         notInteger = false;
         for (int i = 0; i < number.size(); ++i) {
-            if (number[i] != '0' && number[i] != '1' && number[i] != '2' && number[i] != '3' && number[i] != '4' &&
-                number[i] != '5' && number[i] != '6' && number[i] != '7' && number[i] != '8' && number[i] != '9') {
+            if ((number[i] != '0' && number[i] != '1' && number[i] != '2' && number[i] != '3' && number[i] != '4' &&
+                 number[i] != '5' && number[i] != '6' && number[i] != '7' && number[i] != '8' && number[i] != '9')) {
                 notInteger = true;
                 break;
             }
         }
+        if (number.empty()) notInteger = true;
         if (!notInteger) {
             num = stoll(number);
             if (num < 1) notInteger = true;
@@ -286,71 +400,34 @@ void gameOfDominos() {
     vector<dominoT> dominos(num);
 
     for (long long i = 0; i < num; ++i) {
-        notInteger = true;
         cout << "\nPlease enter the Left Dots in " << i + 1 << " dominos :";
         getline(cin, element);
-        while (notInteger) {
-            notInteger = false;
-            for (int j = 0; j < element.size(); ++j) {
-                if (element[j] != '0' && element[j] != '1' && element[j] != '2' && element[j] != '3' &&
-                    element[j] != '4' && element[j] != '5' && element[j] != '6') {
-                    notInteger = true;
-                    break;
-                }
-            }
-            if (!notInteger) {
-                ele = stoi(element);
-                if (ele > 6) notInteger = true;
-            }
-            if (notInteger) {
-                cout << "\nPlease enter a valid Left Dots number in " << i + 1 << " dominos :";
-                getline(cin, element);
-            }
+        while (element != "0" && element != "1" && element != "2" && element != "3" && element != "4" &&
+               element != "5" && element != "6") {
+            cout << "\nPlease enter a valid Left Dots number in " << i + 1 << " dominos :";
+            getline(cin, element);
         }
         ele = stoi(element);
         dominos[i].leftDots = ele;
-        freq[ele]++;
 
-        notInteger = true;
         cout << "\nPlease enter the Right Dots in " << i + 1 << " dominos :";
         getline(cin, element);
-        while (notInteger) {
-            notInteger = false;
-            for (int j = 0; j < element.size(); ++j) {
-                if (element[j] != '0' && element[j] != '1' && element[j] != '2' && element[j] != '3' &&
-                    element[j] != '4' && element[j] != '5' && element[j] != '6') {
-                    notInteger = true;
-                    break;
-                }
-            }
-            if (!notInteger) {
-                ele = stoi(element);
-                if (ele > 6) notInteger = true;
-            }
-            if (notInteger) {
-                cout << "\nPlease enter a valid Right Dots number in " << i + 1 << " dominos :";
-                getline(cin, element);
-            }
+        while (element != "0" && element != "1" && element != "2" && element != "3" && element != "4" &&
+               element != "5" && element != "6") {
+            cout << "\nPlease enter a valid Right Dots number in " << i + 1 << " dominos :";
+            getline(cin, element);
         }
         ele = stoi(element);
         dominos[i].rightDots = ele;
-        freq[ele]++;
     }
-
-    for (auto it: freq) {
-        if (it.second % 2 != 0) odd++;
-    }
-
-    if (odd > 2) cout << "\nNo, it is not possible to build a chain consisting of every domino in the vector.\n";
-    else {
-        if (FormsDominoChain(dominos)) {
-            cout << "Yes, it is possible to build a chain consisting of every domino in the vector.\n";
-            for (int i = 0; i < dominos.size(); ++i) {
-                if (i == dominos.size() - 1) cout << dominos[i].leftDots << " | " << dominos[i].rightDots;
-                else cout << dominos[i].leftDots << " | " << dominos[i].rightDots << " - ";
-            }
-        } else cout << "No, it is not possible to build a chain consisting of every domino in the vector.\n";
-    }
+    if (FormsDominoChain(dominos)) {
+        cout << "\nYes, it is possible to build a chain consisting of every domino in the vector.\n";
+        for (int i = 0; i < dominos.size(); ++i) {
+            if (i == dominos.size() - 1) cout << dominos[i].leftDots << " | " << dominos[i].rightDots;
+            else cout << dominos[i].leftDots << " | " << dominos[i].rightDots << "  -  ";
+        }
+        cout << endl;
+    } else cout << "\nNo, it is not possible to build a chain consisting of every domino in the vector.\n";
 }
 
 //======================================================================================================================
