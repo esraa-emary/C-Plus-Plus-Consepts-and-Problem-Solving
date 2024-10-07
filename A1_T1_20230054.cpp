@@ -1,3 +1,4 @@
+
 // File: A1_T1_20230054.cpp
 // Purpose: A program to perform several tasks.
 // Author: Esraa Emary Abd-El Salam.
@@ -240,109 +241,57 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
         else {
             auto it = find(fi.begin(), fi.end(), odds[0]);
             if (it != fi.end()) {
-                first = it - fi.begin();
                 auto it2 = find(la.begin(), la.end(), odds[1]);
-                if (it2 != la.end()) last = it2 - la.begin();
-                else return false;
+                if (it2 == la.end()) return false;
                 for (int i = 0; i < fi2.size(); ++i) {
                     if (fi2[i] == odds[0]) {
-                        fi[i] = -1;
-                        la[i] = -1;
                         auto r = find(fi.begin(), fi.end(), la2[i]);
                         if (r != fi.end()) {
-                            first = r - fi.begin();
+                            first = i;
+                            arrange.push_back(first);
                             break;
                         }
-                        else{
-                            for (int j = 0; j < fi.size(); ++j) {
-                                fi[j]=fi2[j];
-                                la[j]=la2[j];
-                            }
-                        }
                     }
-                }
-                for (int i = 0; i < fi.size(); ++i) {
-                    fi[i]=fi2[i];
-                    la[i]=la2[i];
                 }
                 for (int i = 0; i < la2.size(); ++i) {
-                    if (la2[i] == odds[1]) {
-                        fi[i] = -1;
-                        la[i] = -1;
+                    if (la2[i] == odds[1] && arrange[0] != i) {
                         auto r = find(la.begin(), la.end(), fi2[i]);
                         if (r != la.end()) {
-                            last = r - la.begin();
+                            last = i;
                             break;
                         }
-                        else{
-                            for (int j = 0; j < fi.size(); ++j) {
-                                fi[j]=fi2[j];
-                                la[j]=la2[j];
-                            }
-                        }
                     }
-                }
-                for (int i = 0; i < fi.size(); ++i) {
-                    fi[i]=fi2[i];
-                    la[i]=la2[i];
                 }
                 fi[first] = -1;
                 la[first] = -1;
                 fi[last] = -1;
                 la[last] = -1;
-                arrange.push_back(first);
             } else {
-                last = it - fi.begin();
                 auto it2 = find(la.begin(), la.end(), odds[1]);
-                if (it2 != la.end()) first = odds[1];
-                else return false;
+                if (it2 == la.end()) return false;
                 for (int i = 0; i < fi2.size(); ++i) {
                     if (fi2[i] == odds[0]) {
-                        fi[i] = -1;
-                        la[i] = -1;
                         auto r = find(fi.begin(), fi.end(), la2[i]);
                         if (r != fi.end()) {
-                            first = r - fi.begin();
+                            first = i;
+                            arrange.push_back(first);
                             break;
                         }
-                        else{
-                            for (int j = 0; j < fi.size(); ++j) {
-                                fi[j]=fi2[j];
-                                la[j]=la2[j];
-                            }
-                        }
                     }
-                }
-                for (int i = 0; i < fi.size(); ++i) {
-                    fi[i]=fi2[i];
-                    la[i]=la2[i];
                 }
                 for (int i = 0; i < la2.size(); ++i) {
-                    if (la2[i] == odds[1]) {
-                        fi[i] = -1;
-                        la[i] = -1;
+                    if (la2[i] == odds[1] && arrange[0] != i) {
                         auto r = find(la.begin(), la.end(), fi2[i]);
                         if (r != la.end()) {
-                            last = r - la.begin();
+                            last = i;
                             break;
                         }
-                        else{
-                            for (int j = 0; j < fi.size(); ++j) {
-                                fi[j]=fi2[j];
-                                la[j]=la2[j];
-                            }
-                        }
                     }
-                }
-                for (int i = 0; i < fi.size(); ++i) {
-                    fi[i]=fi2[i];
-                    la[i]=la2[i];
                 }
                 fi[first] = -1;
                 la[first] = -1;
                 fi[last] = -1;
                 la[last] = -1;
-                arrange.push_back(it2 - la.begin());
             }
         }
     } else if ((start == dominos.size() && odd == 0) || (start == dominos.size() - 1 && odd != 0)) {
@@ -360,7 +309,19 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
             arrange.push_back(it - fi.begin());
             fi[it - fi.begin()] = -1;
             la[it - fi.begin()] = -1;
-        } else return false;
+        } else {
+            fi[arrange[arrange.size() - 1]] = fi2[arrange[arrange.size() - 1]];
+            la[arrange[arrange.size() - 1]] = la2[arrange[arrange.size() - 1]];
+            int x = arrange[arrange.size()-1];
+            arrange.pop_back();
+            auto f = find((x +1+ fi.begin()), fi.end(), la2[arrange[start - 2]]);
+            if (f != fi.end()) {
+                start --;
+                arrange.push_back(f - fi.begin());
+                fi[f - fi.begin()] = -1;
+                la[f - fi.begin()] = -1;
+            } else return false;
+        }
     }
     start++;
     return FormsDominoChain(dominos);
