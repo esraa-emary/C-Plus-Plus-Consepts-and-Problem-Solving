@@ -15,7 +15,7 @@
 // prime numbers from 2 to this number.
 
 // If you choose third problem it will ask you to enter number of dominos then enter left and
-// right number for each domino then if it is possible to make a chain with dominos it makes it
+// right number for each domino then (if it is possible) to make a chain with dominos it makes it
 // and print it otherwise it print no.
 
 // If you choose fourth problem it will ask you to enter file name then it will replace some
@@ -88,7 +88,8 @@ void correctSentence() {
 
     while (true) {
         getline(cin, sentence);
-        for (int i = 0; i < sentence.size(); ++i) {                   // keep taking lines until it find "." and ignore every thing after it.
+        for (int i = 0; i <
+                        sentence.size(); ++i) {                   // keep taking lines until it find "." and ignore every thing after it.
             if (sentence[i] == '.') {
                 found = true;
                 sentence.erase(i + 1, sentence.size() - i - 1);
@@ -103,7 +104,8 @@ void correctSentence() {
     }
 
     found = false;
-    for (int i = 0; i < holeSentence.size(); ++i) {                   // handle spaces by remove all of them and leave just one.
+    for (int i = 0;
+         i < holeSentence.size(); ++i) {                   // handle spaces by remove all of them and leave just one.
         if ((isspace(holeSentence[i]) && !found && i != 0) ||
             (isspace(holeSentence[i]) && !found && i != 0 && holeSentence[i - 1] == '.') ||
             (isspace(holeSentence[i]) && !found && i != 0 && holeSentence[i - 1] == ',')) {
@@ -117,7 +119,8 @@ void correctSentence() {
     }
 
     for (int i = 0; i < corrected.size(); ++i) {
-        if ((i == 0 && !isspace(corrected[i]))) {                 // handle start of a sentence and make it uber case and others lower case.
+        if ((i == 0 && !isspace(
+                corrected[i]))) {                 // handle start of a sentence and make it uber case and others lower case.
             if (isalpha(corrected[i])) corrected[i] = toupper(corrected[i]);
         } else {
             if (isalpha(corrected[i])) corrected[i] = tolower(corrected[i]);
@@ -164,13 +167,15 @@ void getPrimes() {
         }
     }
     num = stoll(number);
-    for (int i = 2; i <= num; ++i) numbers.push_back(i);            // put all numbers from 2 to the entered number in a vector.
-                                                                    // then put primes in a vector and others in another vector.
+    for (int i = 2; i <= num; ++i)
+        numbers.push_back(i);            // put all numbers from 2 to the entered number in a vector.
+    // then put primes in a vector and others in another vector.
     for (int i = 0; i < numbers.size(); ++i) {
         change = false;
         for (int j = 0; j < numbers.size(); ++j) {
             if (numbers[j] % numbers[i] == 0 && numbers[i] < numbers[j]) {
-                numbers.erase(numbers.begin() + j);         // check if any number is a multiple to first number and so on.
+                numbers.erase(
+                        numbers.begin() + j);         // check if any number is a multiple to first number and so on.
                 change = true;
             }
         }
@@ -180,13 +185,13 @@ void getPrimes() {
                 if (it != numbers.end()) continue;
                 else crossed.push_back(j);
             }
-                                                                     // print circled numbers(primes) every step.
+            // print circled numbers(primes) every step.
             cout << "\nThe circled numbers(primes) in " << i + 1 << " are : ";
             for (int j = 0; j < numbers.size(); ++j) {
                 if (j != numbers.size() - 1) cout << numbers[j] << ',';
                 else cout << numbers[j];
             }
-                                                                    // print crossed-out numbers(not prime) every step.
+            // print crossed-out numbers(not prime) every step.
             cout << "\n\nThe crossed-out numbers(not prime) in " << i + 1 << " are : ";
             for (int j = 0; j < crossed.size(); ++j) {
                 if (j != crossed.size() - 1) cout << crossed[j] << ',';
@@ -230,12 +235,14 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
     static int start = 0, odd = 0, first, last;
     static vector<int> fi, la, fi2, la2;
     static deque<int> arrange;
-    map<int, int> freq;
+    static unordered_map<int, int> freq;
     vector<int> odds;
     vector<pair<int, int>> recoFirst, recoSecond;
+    vector<pair<int, int>> sorted;
 
     if (start == 0) {
-        for (int i = 0; i < dominos.size(); ++i) {                   // make 4 vectors fi,fi2,la,la2 and put dominos in it.
+        for (int i = 0;
+             i < dominos.size(); ++i) {                   // make 4 vectors fi,fi2,la,la2 and put dominos in it.
             fi.push_back(dominos[i].leftDots);
             la.push_back(dominos[i].rightDots);
             fi2.push_back(dominos[i].leftDots);
@@ -243,72 +250,83 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
             freq[dominos[i].leftDots]++;
             freq[dominos[i].rightDots]++;
         }
-        for (auto it: freq) {                      // get frequency for every element in dominos and calculate number of odds.
+        for (auto it: freq) {            // get frequency for every element in dominos and calculate number of odds.
             if (it.second % 2 != 0) {
                 odd++;
                 odds.push_back(it.first);
             }
         }
-        if (odd > 2) return false;                                  //  if odd > 2 this mean that its impossible to make a chain.
-        if (odd == 0) arrange.push_back(0);                     // if odd = 0 there is no need to check anything just start with any one.
-        else {                                                     // if odd = 2 i have to know which domino will be at first and which at end of chain.
+        for(auto it : freq){
+            sorted.push_back(make_pair(it.second,it.first));
+        }
+        sort(sorted.begin(), sorted.end(),greater<>());
+        freq.clear();
+        for (const auto& it : sorted) {
+           freq[it.second] = it.first ;
+        }
+        if (odd > 2)
+            return false;                                  //  if odd > 2 this mean that its impossible to make a chain.
+        if (odd == 0)
+            arrange.push_back(0);           // if odd = 0 there is no need to check anything just start with any one.
+        else {                     // if odd = 2 i have to know which domino will be at first and which at end of chain.
             auto it = find(fi.begin(), fi.end(), odds[0]);
             if (it != fi.end()) {
+                bool z = false;
                 auto it2 = find(la.begin(), la.end(), odds[1]);
-                if (it2 == la.end()) return false;                 // if both odd numbers at the same side its impossible to make a chain.
-                for (int i = 0; i < fi2.size(); ++i) {             // loop to know which domino will be at start of chain.
-                    if (fi2[i] == odds[0]) {
-                        auto r = find(fi.begin(), fi.end(), la2[i]);
-                        if (r != fi.end()) {
-                            first = i;
-                            arrange.push_back(first);
-                            break;
-                        }
+                if (it2 == la.end())
+                    return false;                 // if both odd numbers at the same side its impossible to make a chain.
+                for (int i = 0; i < fi2.size(); ++i) {           // loop to know which domino will be at start of chain.
+                    if (fi2[i] == odds[0] && freq[la2[i]] == 2) {
+                        first = i;
+                        z = true;
+                        arrange.push_back(first);
+                        break;
                     }
                 }
-                for (int i = 0; i < la2.size(); ++i) {           // loop to know which domino will be at end of chain.
-                    if (la2[i] == odds[1] && arrange[0] != i) {
-                        auto r = find(la.begin(), la.end(), fi2[i]);
-                        if (r != la.end()) {
-                            last = i;
-                            break;
+                if (!z){
+                    for (int i = 0; i < fi2.size(); ++i) {       // loop to know which domino will be at start of chain.
+                        if (fi2[i] == odds[0]) {
+                            auto r = find(fi.begin(), fi.end(), la2[i]);
+                            if (r != fi.end()) {
+                                first = i;
+                                arrange.push_back(first);
+                                break;
+                            }
                         }
                     }
                 }
                 fi[first] = -1;                                 // change these vales to avoid take it again.
                 la[first] = -1;
-                fi[last] = -1;
-                la[last] = -1;
             } else {
+                bool z = false;
                 auto it2 = find(la.begin(), la.end(), odds[1]);
-                if (it2 == la.end()) return false;              // if both odd numbers at the same side its impossible to make a chain.
-                for (int i = 0; i < fi2.size(); ++i) {
-                    if (fi2[i] == odds[0]) {                    // loop to know which domino will be at start of chain.
-                        auto r = find(fi.begin(), fi.end(), la2[i]);
-                        if (r != fi.end()) {
-                            first = i;
-                            arrange.push_back(first);
-                            break;
-                        }
+                if (it2 == la.end())
+                    return false;                 // if both odd numbers at the same side its impossible to make a chain.
+                for (int i = 0; i < fi2.size(); ++i) {           // loop to know which domino will be at start of chain.
+                    if (fi2[i] == odds[0] && freq[la2[i]] == 2) {
+                        first = i;
+                        z = true;
+                        arrange.push_back(first);
+                        break;
                     }
                 }
-                for (int i = 0; i < la2.size(); ++i) {          // loop to know which domino will be at end of chain.
-                    if (la2[i] == odds[1] && arrange[0] != i) {
-                        auto r = find(la.begin(), la.end(), fi2[i]);
-                        if (r != la.end()) {
-                            last = i;
-                            break;
+                if (!z){
+                    for (int i = 0; i < fi2.size(); ++i) {       // loop to know which domino will be at start of chain.
+                        if (fi2[i] == odds[0]) {
+                            auto r = find(fi.begin(), fi.end(), la2[i]);
+                            if (r != fi.end()) {
+                                first = i;
+                                arrange.push_back(first);
+                                break;
+                            }
                         }
                     }
                 }
                 fi[first] = -1;                                 // change these vales to avoid take it again.
                 la[first] = -1;
-                fi[last] = -1;
-                la[last] = -1;
             }
         }                                                       // put base case.
-    } else if ((start == dominos.size() && odd == 0) || (start == dominos.size() - 1 && odd != 0)) {
-        if (odd != 0) arrange.push_back(last);              // if odd > 0 add last to arrange.
+    } else if (start == dominos.size()) {
         int y = 0;
         for (auto &it: dominos) {
             it.leftDots = fi2[arrange[y]];                     // rearrange domains to make chain.
@@ -317,16 +335,29 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
         }
         return true;
     } else {
+        bool found = false;
         auto it = find(fi.begin(), fi.end(), la2[arrange[start - 1]]);
-        if (it != fi.end()) {                                   // check if there is a value in right of domino and equal to left of last one.
-            arrange.push_back(it - fi.begin());
-            fi[it - fi.begin()] = -1;
-            la[it - fi.begin()] = -1;
+        if (it !=
+            fi.end()) {                                   // check if there is a value in right of domino and equal to left of last one.
+            for (int i = 0; i < fi.size(); ++i) {
+                if (fi[i] == la[i] && fi[i] == la2[arrange[start - 1]]) {
+                    fi[i] = -1;
+                    la[i] = -1;
+                    arrange.push_back(i);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                arrange.push_back(it - fi.begin());
+                fi[it - fi.begin()] = -1;
+                la[it - fi.begin()] = -1;
+            }
         } else {                                                // if there is no value it might be related to last.
             fi[arrange[arrange.size() - 1]] = fi2[arrange[arrange.size() - 1]];
             la[arrange[arrange.size() - 1]] = la2[arrange[arrange.size() - 1]];
             int x = arrange[arrange.size() - 1];
-            arrange.pop_back();                                 // try take another value instead of which depend on last.
+            arrange.pop_back();                                 // try taking another value instead of which depend on last.
             auto f = find((x + 1 + fi.begin()), fi.end(), la2[arrange[start - 2]]);
             if (f != fi.end()) {
                 start--;
@@ -455,7 +486,7 @@ void messageAlteringToAvoidCensorship() {
                             L"شهيد", L"مظاهرة", L"ديكتاتور", L"اغتيال", L"العقوبات", L"انفجار", L"تنظيم", L"تعذيب",
                             L"عدو", L"حظر", L"فساد", L"عصيان", L"نفي", L"اعتداء", L"ارهاب"};
 
-                                                                      // replacement words.
+    // replacement words.
     vector<wstring> alternative = {L"تغيير جذري", L"تعبير عن الرأي", L"احتجاز", L"السلطة التنفيذية", L"مركز إصلاح",
                                    L"تيار مختلف", L"العنف المنظم", L"نزاع مسلح", L"تغيير غير دستوري", L"ضحية النزاع",
                                    L"تجمع سلمي", L"حاكم مستبد", L"تصفية مستهدفة", L"قيود اقتصادية", L"حادث مدمر",
@@ -536,14 +567,16 @@ int main() {
                                "Message Altering to Avoid Censorship.", "Exit"};
     while (true) {
         if (firstTime) {
-            string starOrOut = continueOrLeave(stay);                   // check if it is the first time to enter a function  (to handle menu).
+            string starOrOut = continueOrLeave(
+                    stay);                   // check if it is the first time to enter a function  (to handle menu).
             while (starOrOut != "1" && starOrOut != "2") {
-                cout << "Please enter a correct choice !\n\n";
+                cout << "Please enter a correct choice !\n";
                 starOrOut = continueOrLeave(stay);
             }
             if (starOrOut == "2") break;
         }
-        string choiceProblems = enterProblem(problems);                 // get number of problems and check its validity.
+        string choiceProblems = enterProblem(
+                problems);                 // get number of problems and check its validity.
         while (choiceProblems != "1" && choiceProblems != "2" && choiceProblems != "3" && choiceProblems != "1" &&
                choiceProblems != "4" && choiceProblems != "5") {
             cout << "Please enter a correct choice !\n";
