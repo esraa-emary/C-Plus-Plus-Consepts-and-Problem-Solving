@@ -597,6 +597,7 @@ void messageAlteringToAvoidCensorship() {
     outFile.imbue(std::locale(outFile.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
     outFile << edited;                                                  // return the message in the file.
     outFile.close();
+    wcout << L"The edited message is : " << edited << endl << endl;
     wcout << L"File edited successfully!\n";
     wcin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
