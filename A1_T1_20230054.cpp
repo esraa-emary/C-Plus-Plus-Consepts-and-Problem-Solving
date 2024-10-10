@@ -4,7 +4,7 @@
 // ID: 20230054
 // Date: 8 Oct 2024
 
-//==============================================Program details=========================================================
+//============================================== Program details =========================================================
 
 // The program start with a menu to choose a problem to solve then in each problem it asks you if you want to
 // continue or back.
@@ -391,24 +391,38 @@ bool FormsDominoChain(vector<dominoT> &dominos) {
             la[arrange[arrange.size() - 1]] = la2[arrange[arrange.size() - 1]];
             int x = arrange[arrange.size() - 1];
             arrange.pop_back();                                 // try taking another value instead of which depend on last.
-            auto f = find((x + 1 + fi.begin()), fi.end(), la2[arrange[start - 2]]);
+            start--;
+            auto f = find((x + 1 + fi.begin()), fi.end(), la2[arrange[arrange.size()-1]]);
             if (f != fi.end()) {
-                start--;
                 arrange.push_back(f - fi.begin());
                 fi[f - fi.begin()] = -1;
                 la[f - fi.begin()] = -1;
-            } else {
-                fi.clear();
-                la.clear();
-                fi2.clear();
-                la2.clear();
-                arrange.clear();
-                freq.clear();
-                odds.clear();
-                recoFirst.clear();
-                recoSecond.clear();
-                start = 0, odd = 0;
-                return false;
+            }
+            else{
+                fi[arrange[arrange.size() - 1]] = fi2[arrange[arrange.size() - 1]];
+                la[arrange[arrange.size() - 1]] = la2[arrange[arrange.size() - 1]];
+                int x = arrange[arrange.size() - 1];
+                arrange.pop_back();
+                start--;
+                auto f = find((x + 1 + fi.begin()), fi.end(), la2[arrange[arrange.size()-1]]);
+                if (f != fi.end()) {
+                    arrange.push_back(f - fi.begin());
+                    fi[f - fi.begin()] = -1;
+                    la[f - fi.begin()] = -1;
+                }
+                else {
+                    fi.clear();
+                    la.clear();
+                    fi2.clear();
+                    la2.clear();
+                    arrange.clear();
+                    freq.clear();
+                    odds.clear();
+                    recoFirst.clear();
+                    recoSecond.clear();
+                    start = 0, odd = 0;
+                    return false;
+                }
             }
         }
     }
